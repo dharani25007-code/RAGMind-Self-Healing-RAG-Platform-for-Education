@@ -1,3 +1,84 @@
+# StudyAI
+
+Self-Healing RAG Knowledge Hub — powered by Groq LLaMA.
+
+StudyAI lets you upload study materials (PDF, DOCX, TXT, code, images and more), index them into chunks, and chat with an AI that uses a retrieval-augmented generation pipeline. The system critiques its own answers and retries with reformulated queries until it converges or falls back gracefully.
+
+Features
+- Session-based chat UI with per-session history
+- Universal file support: PDF, DOCX, TXT, CSV, XLSX, code, images (60+ formats)
+- Chunked indexing with overlap for robust retrieval
+- Self-healing RAG loop: generate → critique → reformulate → retry
+- Graceful fallbacks and structured error types for external API failures
+
+Requirements
+- Python 3.11+
+- Node.js 16+ (for frontend)
+
+Quickstart (Windows)
+
+1. Create and activate the backend venv (PowerShell):
+
+```powershell
+python -m venv .\backend\.venv
+(Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& .\backend\.venv\Scripts\Activate.ps1)
+```
+
+2. Install backend dependencies:
+
+```powershell
+python -m pip install --upgrade pip
+python -m pip install -r backend/requirements.txt
+```
+
+3. Create `backend/.env` (example):
+
+```
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
+TOP_K_CHUNKS=5
+CHUNK_SIZE=1000
+# other settings in backend/config.py
+```
+
+4. Start the backend (from repo root):
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m uvicorn backend.main:app --reload --port 8000
+```
+
+5. Frontend: install and run (from `frontend`):
+
+```bash
+cd frontend
+npm install
+npm run dev
+# open the local URL printed by Vite (usually http://localhost:3000 or 3001)
+```
+
+API & Docs
+- The backend exposes OpenAPI docs at `http://localhost:8000/docs` when running.
+
+Troubleshooting
+- 413 / Request too large from Groq: This indicates your RAG prompt exceeded the model token limit. Fixes:
+     - Reduce `TOP_K_CHUNKS` in `backend/.env`.
+     - Reduce `CHUNK_SIZE` or increase chunk overlap strategy to create smaller contexts.
+     - Implement token budgeting or upgrade to a higher token-cap model/tier.
+- `ModuleNotFoundError: No module named 'backend'` when running Uvicorn: run uvicorn from the repo root (see step 4) so Python can import the `backend` package.
+- HTTP client / Groq compatibility: the repo pins `httpx==0.27.2` to match the `groq` client requirements.
+
+Development notes
+- Database: SQLite used by default. Tables live in `backend/database/db.py`.
+- Uploads are saved under the path from `backend/config.py` (`UPLOAD_DIR`).
+- Session rename/delete endpoints exist at `/api/sessions`.
+
+Contributing
+- Fork, branch, and open a PR. Run tests (if added) and keep changes focused.
+
+License
+- MIT
+
+If you'd like, I can also add a short Troubleshooting section inside the app (health endpoints) or create a script to bootstrap `.env` from a template.
 <div align="center">
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=14b8a6&height=200&section=header&text=StudyAI&fontSize=80&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Self-Healing%20RAG%20Knowledge%20Hub%20%7C%20Powered%20by%20Groq%20LLaMA3.3&descAlignY=60&descAlign=50" width="100%"/>
@@ -330,5 +411,7 @@ MIT License — free to use and modify.
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=14b8a6&height=100&section=footer" width="100%"/>
 
-</div>#   S t u d y A I  
+</div>#   S t u d y A I 
+ 
+ #   S t u d y A I  
  
